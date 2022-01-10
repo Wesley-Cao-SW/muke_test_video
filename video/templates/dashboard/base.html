@@ -8,10 +8,11 @@
     ${self.css()}
 </head>
 <body>
+<%! from django.shortcuts import reverse %>
 <%include file="nav.html" />
 <div id="base-area">
     <ul class="side-menu">
-        <li>管理员</li>
+        <li><a href="${reverse('dashboard_admin')}">管理员</a></li>
         <li>用户</li>
         <li>视频</li>
     </ul>
