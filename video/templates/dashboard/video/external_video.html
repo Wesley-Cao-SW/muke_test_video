@@ -1,0 +1,89 @@
+<%inherit file="../base.html" />
+<%def name="title()">管理员管理</%def>
+<%def name="css()">
+<link href="/static/dashboard/css/external_video.css" rel="stylesheet" />
+</%def>
+<%def name="content()">
+<%! from django.shortcuts import reverse %>
+<h1>外链视频模块</h1>
+<button class="btn btn-default open-btn" id="open-add-video-btn">创建</button><span>${error}</span>
+<form id="video-edit-area" class="form-horizontal add-video-area" action="" method="POST">
+    ${csrf_token}
+    <div class="form-group">
+        <label >视频名称</label>
+        <input type="text" class="form-control" name="name" placeholder="视频名称" required>
+    </div>
+    <div class="form-group">
+        <label >海报</label>
+        <input type="text" class="form-control" name="image" placeholder="海报" >
+    </div>
+    <div class="form-group">
+        <label >简介</label>
+        <textarea class="form-control" name="info" placeholder="简介" ></textarea>
+    </div>
+    <%
+        from app.model.video import VideoType, FromType, NationalityType
+    %>
+    <div class="form-group">
+        <label >类型</label>
+        <select class="form-control edit-select" name="video_type">
+            % for video_type in VideoType:
+            <option value="${video_type.value}">${video_type.label}</option>
+            % endfor
+        </select>
+    </div>
+    <div class="form-group">
+        <label >来源</label>
+        <select class="form-control edit-select" name="from_to">
+            % for from_type in FromType:
+            % if from_type != FromType('custom'):
+            <option value="${from_type.value}">${from_type.label}</option>
+            % endif
+            % endfor
+        </select>
+    </div>
+    <div class="form-group">
+        <label >国籍</label>
+        <select class="form-control edit-select" name="nationality">
+            % for nationality_type in NationalityType:
+            <option value="${nationality_type.value}">${nationality_type.label}</option>
+            % endfor
+        </select>
+    </div>
+    <button type="submit" class="form-control">添加</button>
+</form>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>名称</th>
+            <th>海报</th>
+            <th>类别</th>
+            <th>简介</th>
+            <th>来源</th>
+            <th>国籍</th>
+            <th>创建时间</th>
+            <th>最后修改时间</th>
+            <th>状态</th>
+        </tr>
+    </thead>
+    <tbody>
+            % for video in videos:
+            <tr>
+            <td>${video.name}</td>
+            <td><img class="video-images" src="${video.image}" /></td>
+            <td>${VideoType(video.video_type).label}</td>
+            <td>${video.info}</td>
+            <td>${video.from_to}</td>
+            <td>${video.nationality}</td>
+            <td>${video.utc_to_local(video.created_time)}</td>
+            <td>${video.utc_to_local(video.updated_time)}</td>
+            <td>${video.status}</td>
+            </tr>
+            % endfor
+    </tbody>
+</table>
+</%def>
+
+<%def name="js()">
+    <script src="/static/dashboard/js/external_video.js"></script>
+</%def>

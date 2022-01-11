@@ -14,7 +14,8 @@
     <ul class="side-menu">
         <li><a href="${reverse('dashboard_admin')}">管理员</a></li>
         <li>用户</li>
-        <li>视频</li>
+        <li><a href="${reverse('dashboard_externalvideo')}">外链视频</a></li>
+        <li>自制视频</li>
     </ul>
     <div class="base-content" />
         ${self.content()}

@@ -1,13 +1,18 @@
 <!DOCTYPE html>
+<%! from django.shortcuts import reverse %>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
     <link href="/static/dashboard/css/bootstrap.min.css" rel="stylesheet" />
     <link href="/static/dashboard/css/login.css" rel="stylesheet" />
+    ${csrf_token}
 </head>
 <body>
-    <form class="form-horizontal edit-area" action="/dashboard/login" method="POST">
+    <%
+        action = reverse('dashboard_login') if not to else '{}?to={}'.format(reverse('dashboard_login'), to)
+    %>
+    <form class="form-horizontal edit-area" action="${action}" method="POST">
         ${csrf_token}
         <div class="form-group">
           <label >用户名</label>

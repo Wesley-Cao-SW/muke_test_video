@@ -7,6 +7,8 @@ from app.libs.base_mako import render_to_response
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.core.paginator import Paginator
+from app.utils.permission import dashboard_auth
+from django.middleware.csrf import get_token ,rotate_token
 
 # 登录
 class Login(View):
@@ -15,9 +17,13 @@ class Login(View):
     def get(self, request):
         data = {}
         data['error'] = ''
+        # get_token(request)
         
         if request.user.is_authenticated:
             return redirect(reverse('dashboard_index'))
+        
+        to = request.GET.get('to', '')
+        data['to'] = to
         
         return render_to_response(request, self.TEMPLATE, data)
     
@@ -25,6 +31,7 @@ class Login(View):
         data={}
         username = request.POST.get('username')
         password = request.POST.get('password')
+        to = request.GET.get('to', '')
         
         exists = User.objects.filter(username=username).exists()
         if not exists:
@@ -43,6 +50,10 @@ class Login(View):
         
         login(request, user)
 
+        
+        if to:
+            return redirect(to)
+        
         return redirect(reverse('dashboard_index'))
    
 # 注销 
@@ -55,6 +66,7 @@ class Logout(View):
 class AdminManger(View):
     TEMPLATE = 'dashboard/auth/admin.html'
     
+    @dashboard_auth
     def get(self, request):
         data = {}
         # users = User.objects.filter(is_superuser=True)
