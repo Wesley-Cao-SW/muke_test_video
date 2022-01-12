@@ -1,0 +1,10 @@
+.form-group {
+    padding-left: 25px;
+    padding-right: 20px;
+}
+.add-video-area{
+    width: 50%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    margin-left: 10px;
+}

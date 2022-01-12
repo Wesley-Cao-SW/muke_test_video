@@ -23,6 +23,7 @@
     </div>
     <%
         from app.model.video import VideoType, FromType, NationalityType
+        from app.utils.myfilter import showtime
     %>
     <div class="form-group">
         <label >类型</label>
@@ -64,6 +65,7 @@
             <th>创建时间</th>
             <th>最后修改时间</th>
             <th>状态</th>
+            <th>操作</th>
         </tr>
     </thead>
     <tbody>
@@ -72,12 +74,13 @@
             <td>${video.name}</td>
             <td><img class="video-images" src="${video.image}" /></td>
             <td>${VideoType(video.video_type).label}</td>
-            <td>${video.info}</td>
-            <td>${video.from_to}</td>
-            <td>${video.nationality}</td>
+            <td><p class="info">${video.info}</p></td>
+            <td>${FromType(video.from_to).label}</td>
+            <td>${NationalityType(video.nationality).label}</td>
             <td>${video.utc_to_local(video.created_time)}</td>
             <td>${video.utc_to_local(video.updated_time)}</td>
             <td>${video.status}</td>
+            <td><a href="">编辑</a>|<a href="${reverse('dashboard_videosub', kwargs={'video_id': video.id})}">附属信息</a></td>
             </tr>
             % endfor
     </tbody>

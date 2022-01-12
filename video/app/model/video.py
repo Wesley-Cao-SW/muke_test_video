@@ -38,6 +38,15 @@ NationalityType.korea.label = '韩国'
 NationalityType.america.label = '美国'
 NationalityType.other.label = '其他'
 
+class IdentityType(Enum):
+    to_star = 'to_star'
+    supporting_rule = 'supporting_rule'
+    director = 'director'
+    
+IdentityType.to_star.label = '主演'
+IdentityType.supporting_rule.label = '配角'
+IdentityType.director.label = '导演'
+
 class Video(models.Model):
     name = models.CharField(max_length=100, null=False)
     image = models.CharField(max_length=500, default='')
@@ -57,6 +66,7 @@ class Video(models.Model):
     
     def utc_to_local(self, utc_time):
         time = utc_time + timedelta(hours=8)
+        time = time.strftime("%Y-%m-%d %H:%M:%S")
         return time
     
 class VideoStar(models.Model):

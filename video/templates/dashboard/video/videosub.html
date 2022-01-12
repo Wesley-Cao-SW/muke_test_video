@@ -1,0 +1,86 @@
+<%inherit file="../base.html" />
+<%def name="title()">${video.name}</%def>
+${error}
+<%def name="css()">
+<link href="/static/dashboard/css/videosub.css" rel="stylesheet" />
+</%def>
+<%def name="content()">
+<%! 
+    from django.shortcuts import reverse 
+    from app.model.video import IdentityType
+%>
+<h1>${video.name}</h1>
+<h2>集数</h2>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>集数</th>
+            <th>地址</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+            %for videosub in video.video_sub.all():
+            <tr>
+            <td>第${videosub.number}集</td>
+            <td>${videosub.url}</td>
+            <td>
+                <a href="${videosub.url}">查看</a><br />
+                <a href="${reverse('dashboard_sub_delete', kwargs = {'video_id': video.id, 'sub_id':videosub.id})}">删除</a>
+                <a href="">编辑</a>
+            </td>
+            </tr>
+            % endfor
+    </tbody>
+</table>
+
+<h2>演员</h2>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>名称</th>
+            <th>职务</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+            %for videostar in video.video_star.all():
+            <tr>
+            <td>${videostar.name}</td>
+            <td>${IdentityType(videostar.identity).label}</td>
+            <td>
+                <a href="${reverse('dashboard_star_delete', kwargs = {'video_id': video.id, 'star_id':videostar.id})}">删除</a><br />
+                <a href="">编辑</a><br />
+            </td>
+            </tr>
+            % endfor
+    </tbody>
+</table>
+
+<form id="video-edit-star-area" class="form-horizontal add-video-area" action="${reverse('dashboard_star')}" method="POST">
+    ${csrf_token}
+    <div class="form-group">
+        <label >演员名称</label>
+        <input type="text" class="form-control" name="name" placeholder="名称" >
+    </div>
+    <div class="form-group">
+        <label >演员角色</label>
+        <select class="form-control edit-select" name="identity">
+            %for identity in IdentityType:
+            <option value="${identity.value}">${identity.label}</option>
+            %endfor
+        </select>
+    </div>
+    <input type="hidden" name="video_id" value="${video.id}">
+    <button type="submit" class="form-control">添加</button>
+</form>
+<form id="video-edit-video-area" class="form-horizontal add-video-area" method="POST">
+    ${csrf_token}
+    <div class="form-group">
+        <label >视频地址</label>
+        <input type="text" class="form-control" name="url" placeholder="地址" >
+    </div>
+    <button type="submit" class="form-control">添加</button>
+</form>
+</%def>
