@@ -1,26 +1,31 @@
+var inputNumber = $('#number');
+var inputUrl = $('#url');
+var videosubInputId = $('#videosub-input-id');
 
-var videoAreaStatus = false;
-var videoEditArea = $('#video-edit-star-area');
+$('.update-video-btn').click(function(){
+    var videosubId = $(this).attr('data-id');
+    var videosubUrl = $(this).attr('data-url');
+    var videosubNumber = parseInt($(this).attr('data-number'));
 
-$('#open-add-star-btn').click(function(){
-    if (!videoAreaStatus){
-        videoEditArea.show();
-        videoAreaStatus = true;
-    }else{
-        videoEditArea.hide();
-        videoAreaStatus = false;
-    }
+
+    inputNumber.val(videosubNumber);
+    inputUrl.val(videosubUrl);
+    videosubInputId.val(videosubId);
+
 });
 
-var videoAreaStatus2 = false;
-var videoEditArea2 = $('#video-edit-video-area');
+var inputName = $('#name');
+var inputIdentity = $('#identity');
+var videostarId = $('#star-id');
 
-$('#open-add-video-btn').click(function(){
-    if (!videoAreaStatus){
-        videoEditArea2.show();
-        videoAreaStatus2 = true;
-    }else{
-        videoEditArea2.hide();
-        videoAreaStatus2 = false;
-    }
+$('.update-star-btn').click(function(){
+    var videostarInputId = $(this).attr('data-id');
+    var videostarIdentity = $(this).attr('data-identity');
+    var videostarName = $(this).attr('data-name');
+
+
+    inputName.val(videostarName);
+    inputIdentity.val(videostarIdentity);
+    videostarId.val(videostarInputId);
+
 });

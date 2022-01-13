@@ -1,0 +1,58 @@
+<%inherit file="../base.html" />
+<%def name="title()">视频编辑</%def>
+<%def name="css()">
+<link href="/static/dashboard/css/videoupdate.css" rel="stylesheet" />
+</%def>
+<%def name="content()">
+<%! from django.shortcuts import reverse %>
+<form id="video-edit-area" class="form-horizontal add-video-area" action="${reverse('dashboard_externalvideo')}" method="POST">
+    ${csrf_token}
+    <div class="form-group">
+        <label >视频名称</label>
+        <input type="text" class="form-control" name="name" placeholder="视频名称" value="${video.name}" required>
+    </div>
+    <div class="form-group">
+        <label >海报</label>
+        <input type="text" class="form-control" name="image" placeholder="海报" value="${video.image}" >
+        <img src="${video.image}" />
+    </div>
+    <div class="form-group">
+        <label >简介</label>
+        <textarea class="form-control" name="info" placeholder="简介" value="${video.info}" >${video.info}</textarea>
+    </div>
+    <%
+        from app.model.video import VideoType, FromType, NationalityType
+        from app.utils.myfilter import showtime
+    %>
+    <div class="form-group">
+        <label >类型</label>
+        <select class="form-control edit-select" name="video_type">
+            <option value="${VideoType(video.video_type).value}">${VideoType(video.video_type).label}</option>
+            % for videotype in VideoType:
+            <option value="${videotype.value}">${videotype.label}</option>
+            % endfor
+        </select>
+    </div>
+    <div class="form-group">
+        <label >来源</label>
+        <select class="form-control edit-select" name="from_to" >
+            <option value="${FromType(video.from_to).value}">${FromType(video.from_to).label}</option>
+            % for from_type in FromType:
+            <option value="${from_type.value}">${from_type.label}</option>
+            % endfor
+        </select>
+    </div>
+    <div class="form-group">
+        <label >国籍</label>
+        <select  class="form-control edit-select" name="nationality" >
+            <option value="${NationalityType(video.nationality).value}">${NationalityType(video.nationality).label}</option>
+            % for nationality_type in NationalityType:
+            <option value="${nationality_type.value}">${nationality_type.label}</option>
+            % endfor
+        </select>
+    </div>
+    <input  type="hidden" name="video_id" value="${video.id}">
+    ${error}
+    <button type="submit" class="form-control">添加</button>
+</form>
+</%def>

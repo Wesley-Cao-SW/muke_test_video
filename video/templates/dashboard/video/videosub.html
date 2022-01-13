@@ -10,6 +10,40 @@ ${error}
     from app.model.video import IdentityType
 %>
 <h1>${video.name}</h1>
+
+<form id="video-edit-video-area" class="form-horizontal add-video-area" method="POST">
+    ${csrf_token}
+    <p>视频修改区域</p>
+    <div class="form-group">
+        <label >视频地址</label>
+        <input id="url" type="text" class="form-control" name="url" placeholder="地址" >
+        <label >视频集数</label>
+        <input id="number" type="number" class="form-control" name="number" placeholder="集数" >
+        <input id="videosub-input-id" type="hidden" name="videosub_id" value="" >
+    </div>
+    <button type="submit" class="form-control">添加/修改</button>
+</form>
+
+<form id="video-edit-star-area" class="form-horizontal add-video-area" action="${reverse('dashboard_star')}" method="POST">
+    ${csrf_token}
+    <p>演员修改区域</p>
+    <div class="form-group">
+        <label >演员名称</label>
+        <input id="name" type="text" class="form-control" name="name" placeholder="名称" >
+    </div>
+    <div class="form-group">
+        <label >演员角色</label>
+        <select id="identity" class="form-control edit-select" name="identity">
+            %for identity in IdentityType:
+            <option value="${identity.value}">${identity.label}</option>
+            %endfor
+        </select>
+    </div>
+    <input id="star-id" type="hidden" name="star_id" value="">
+    <input  type="hidden" name="video_id" value="${video.id}">
+    <button type="submit" class="form-control">添加/修改</button>
+</form>
+
 <h2>集数</h2>
 <table class="table table-hover">
     <thead>
@@ -23,11 +57,11 @@ ${error}
             %for videosub in video.video_sub.all():
             <tr>
             <td>第${videosub.number}集</td>
-            <td>${videosub.url}</td>
+            <td><p class="url">${videosub.url}</p></td>
             <td>
-                <a href="${videosub.url}">查看</a><br />
-                <a href="${reverse('dashboard_sub_delete', kwargs = {'video_id': video.id, 'sub_id':videosub.id})}">删除</a>
-                <a href="">编辑</a>
+                <a class="btn btn-default" href="${videosub.url}">查看</a><br />
+                <a class="btn btn-default" href="${reverse('dashboard_sub_delete', kwargs = {'video_id': video.id, 'sub_id':videosub.id})}">删除</a><br />
+                <button class="btn btn-default update-video-btn" data-id="${videosub.id}" data-number="${videosub.number}" data-url="${videosub.url}">编辑</button>
             </td>
             </tr>
             % endfor
@@ -50,37 +84,16 @@ ${error}
             <td>${videostar.name}</td>
             <td>${IdentityType(videostar.identity).label}</td>
             <td>
-                <a href="${reverse('dashboard_star_delete', kwargs = {'video_id': video.id, 'star_id':videostar.id})}">删除</a><br />
-                <a href="">编辑</a><br />
+                <a class="btn btn-default" href="${reverse('dashboard_star_delete', kwargs = {'video_id': video.id, 'star_id':videostar.id})}">删除</a><br />
+                <button class="btn btn-default update-star-btn"  data-name="${videostar.name}" data-id="${videostar.id}" data-identity="${IdentityType(videostar.identity).value}">编辑</button>
             </td>
             </tr>
             % endfor
     </tbody>
 </table>
 
-<form id="video-edit-star-area" class="form-horizontal add-video-area" action="${reverse('dashboard_star')}" method="POST">
-    ${csrf_token}
-    <div class="form-group">
-        <label >演员名称</label>
-        <input type="text" class="form-control" name="name" placeholder="名称" >
-    </div>
-    <div class="form-group">
-        <label >演员角色</label>
-        <select class="form-control edit-select" name="identity">
-            %for identity in IdentityType:
-            <option value="${identity.value}">${identity.label}</option>
-            %endfor
-        </select>
-    </div>
-    <input type="hidden" name="video_id" value="${video.id}">
-    <button type="submit" class="form-control">添加</button>
-</form>
-<form id="video-edit-video-area" class="form-horizontal add-video-area" method="POST">
-    ${csrf_token}
-    <div class="form-group">
-        <label >视频地址</label>
-        <input type="text" class="form-control" name="url" placeholder="地址" >
-    </div>
-    <button type="submit" class="form-control">添加</button>
-</form>
+</%def>
+
+<%def name="js()">
+    <script src="/static/dashboard/js/videosub.js"></script>
 </%def>

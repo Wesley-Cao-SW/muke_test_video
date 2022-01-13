@@ -30,30 +30,54 @@ class ExternalVideo(View):
         from_to = request.POST.get('from_to')
         nationality = request.POST.get('nationality')
         info = request.POST.get('info')
+        video_id = request.POST.get('video_id')
+        
+        if video_id:
+            reverse_path = reverse('dashboard_externalvideo_update', kwargs={'video_id': video_id})
+        else:
+            reverse_path = reverse('dashboard_externalvideo')
         
         if not all([name, image, video_type, from_to, nationality, info]):
-            return redirect('{}?error={}'.format(reverse('dashboard_externalvideo'), '缺少必要信息'))
+            return redirect('{}?error={}'.format(reverse_path, '缺少必要信息'))
         
         result = check_and_get_video_type(VideoType, video_type, '非法的视频类型')
         if result.get('code') != 0 :
-            return redirect('{}?error={}'.format(reverse('dashboard_externalvideo'), result.message))
+            return redirect('{}?error={}'.format(reverse_path, result.message))
         
         result = check_and_get_video_type(FromType, from_to, '非法的视频来源')
         if result.get('code') != 0 :
-            return redirect('{}?error={}'.format(reverse('dashboard_externalvideo'), result.message))
+            return redirect('{}?error={}'.format(reverse_path, result.message))
         
         result = check_and_get_video_type(NationalityType, nationality, '该国家未收录')
         if result.get('code') != 0 :
-            return redirect('{}?error={}'.format(reverse('dashboard_externalvideo'), result.message))
+            return redirect('{}?error={}'.format(reverse_path, result.message))
         
-        Video.objects.create(
-            name=name,
-            image=image,
-            video_type=video_type,
-            from_to=from_to,
-            nationality=nationality,
-            info=info
-        )
+        if not video_id:
+            try:
+                Video.objects.create(
+                    name=name,
+                    image=image,
+                    video_type=video_type,
+                    from_to=from_to,
+                    nationality=nationality,
+                    info=info
+                )
+            except:
+                return redirect('{}?error={}'.format(reverse_path, '创建失败'))
+            
+        else:
+            try:
+                video = Video.objects.get(id=video_id)
+                video.name = name
+                video.image = image
+                video.video_type = video_type
+                video.from_to = from_to
+                video.nationality = nationality
+                video.info = info
+                video.save()
+            except:
+                return redirect('{}?error={}'.format(reverse_path, '修改失败'))
+            
         
         return redirect(reverse('dashboard_externalvideo'))
 
@@ -72,26 +96,35 @@ class VideoSubView(View):
     def post(self, request, video_id):
         data = {}
         url = request.POST.get('url')
+        number = request.POST.get('number')
         data['url'] = url
         
         video = Video.objects.get(id=video_id)
         
-        length = video.video_sub.count()
+        if not all([url, number]):
+            return redirect('{}?error={}'.format(reverse('dashboard_videosub', kwargs = {'video_id': video_id}), '缺少信息'))
         
-        nums = length + 1
+        videosub_id = request.POST.get('videosub_id')
         
-        if not url:
-            return redirect('{}?error={}'.format(reverse('dashboard_videosub', kwargs = {'video_id': video_id}), '缺少视频地址'))
+        if not videosub_id:
+            try:
+                VideoSub.objects.create(
+                    video = video,
+                    url = url,
+                    number = number,
+                )
+            except:
+                return redirect('{}?error={}'.format(reverse('dashboard_videosub', kwargs = {'video_id': video_id}), '创建失败'))
         
-        try:
-            VideoSub.objects.create(
-                video = video,
-                url = url,
-                number = nums,
-            )
-        except:
-            return redirect('{}?error={}'.format(reverse('dashboard_videosub', kwargs = {'video_id': video_id}), '创建失败'))
-        
+        else:
+            try:
+                videosub = VideoSub.objects.get(id=videosub_id)
+                videosub.url = url
+                videosub.number = number
+                videosub.save()
+            except:
+                return redirect('{}?error={}'.format(reverse('dashboard_videosub', kwargs = {'video_id': video_id}), '修改失败'))
+            
         return redirect(reverse('dashboard_videosub', kwargs = {'video_id': video_id}))
         
 class VideoStarView(View):
@@ -99,6 +132,7 @@ class VideoStarView(View):
         name = request.POST.get('name')
         identity = request.POST.get('identity')
         video_id = request.POST.get('video_id')
+        star_id = request.POST.get('star_id')
         
         
         if not all([name, video_id, identity]):
@@ -109,11 +143,23 @@ class VideoStarView(View):
             return redirect('{}?error={}'.format(reverse('dashboard_videosub', kwargs = {'video_id': video_id}), result.message))
         
         video =Video.objects.get(id=video_id)
-        try:
-            VideoStar.objects.create(video=video, identity=identity, name=name)
-        except:
-            return redirect('{}?error={}'.format(reverse('dashboard_videosub', kwargs = {'video_id': video_id}), '创建失败'))
         
+        if not star_id:
+            try:
+                VideoStar.objects.create(video=video, identity=identity, name=name)
+            except:
+                return redirect('{}?error={}'.format(reverse('dashboard_videosub', kwargs = {'video_id': video_id}), '创建失败'))
+        
+        else:
+            try:
+                videostar = VideoStar.objects.get(id=star_id)
+                videostar.name = name
+                videostar.identity = identity
+                videostar.save()
+            except:
+                return redirect('{}?error={}'.format(reverse('dashboard_videosub', kwargs = {'video_id': video_id}), '修改失败'))
+            
+            
         return redirect(reverse('dashboard_videosub', kwargs = {'video_id': video_id}))
 
 class StarDelet(View):
@@ -129,3 +175,24 @@ class SubDelet(View):
         sub.delete()
         
         return redirect(reverse('dashboard_videosub', kwargs = {'video_id': video_id}))
+    
+class VideoUpdate(View):
+    TEMPLATE = 'dashboard/video/videoupdtae.html'
+
+    @dashboard_auth
+    def get(self, request, video_id):
+        video = Video.objects.get(id=video_id)
+        error = request.GET.get('error','')
+        data = {}
+        data['video'] = video
+        data['error'] = error
+        
+        return render_to_response(request, self.TEMPLATE, data)
+    
+class VideoStatusUpdate(View):
+    def get(self, request, video_id):
+        video = Video.objects.get(id=video_id)
+        video.status = not video.status
+        video.save()
+        
+        return redirect(reverse('dashboard_externalvideo'))

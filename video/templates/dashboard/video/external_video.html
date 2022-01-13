@@ -80,7 +80,9 @@
             <td>${video.utc_to_local(video.created_time)}</td>
             <td>${video.utc_to_local(video.updated_time)}</td>
             <td>${video.status}</td>
-            <td><a href="">编辑</a>|<a href="${reverse('dashboard_videosub', kwargs={'video_id': video.id})}">附属信息</a></td>
+            <td><a href="${reverse('dashboard_externalvideo_update', kwargs={'video_id':video.id})}">编辑</a><br />
+                <a href="${reverse('dashboard_videosub', kwargs={'video_id': video.id})}">附属信息</a><br />
+                <a href="${reverse('dashboard_externalvideo_statusupdate', kwargs={'video_id': video.id})}">修改状态</a></td>
             </tr>
             % endfor
     </tbody>
