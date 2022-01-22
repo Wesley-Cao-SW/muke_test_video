@@ -8,5 +8,6 @@ from app.utils.permission import dashboard_auth
 class Index(View):
     TEMPLATE = 'dashboard/index.html'
     
+    @dashboard_auth
     def get(self, request):
         return render_to_response(request, self.TEMPLATE)

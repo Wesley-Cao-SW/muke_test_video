@@ -6,7 +6,7 @@ from django.shortcuts import redirect, reverse
 from app.libs.base_mako import render_to_response
 from app.utils.permission import dashboard_auth
 from app.model.video import VideoType, FromType, NationalityType, IdentityType
-from app.utils.common import check_and_get_video_type
+from app.utils.common import check_and_get_video_type, handle_video
 from app.model.video import Video, VideoSub, VideoStar
 
 class ExternalVideo(View):
@@ -18,8 +18,10 @@ class ExternalVideo(View):
         error = request.GET.get('error', '')
         data['error'] = error
         
-        videos = Video.objects.exclude(from_to=FromType.custom.value)
-        data['videos'] = videos
+        cus_videos = Video.objects.filter(from_to=FromType.custom.value)
+        ex_videos = Video.objects.exclude(from_to=FromType.custom.value)
+        data['ex_videos'] = ex_videos
+        data['cus_videos'] = cus_videos
         
         return render_to_response(request, self.TEMPLATE, data)
 
@@ -95,16 +97,25 @@ class VideoSubView(View):
     
     def post(self, request, video_id):
         data = {}
-        url = request.POST.get('url')
         number = request.POST.get('number')
-        data['url'] = url
+        videosub_id = request.POST.get('videosub_id')
         
         video = Video.objects.get(id=video_id)
+        
+        if FromType(video.from_to) == FromType.custom:
+            url = request.FILES.get('url')
+        else:
+            url = request.POST.get('url')
+            
+        data['url'] = url
         
         if not all([url, number]):
             return redirect('{}?error={}'.format(reverse('dashboard_videosub', kwargs = {'video_id': video_id}), '缺少信息'))
         
-        videosub_id = request.POST.get('videosub_id')
+        if FromType(video.from_to) == FromType.custom:
+            handle_video(url, video_id, number)
+            return redirect(reverse('dashboard_videosub', kwargs = {'video_id': video_id}))
+            
         
         if not videosub_id:
             try:

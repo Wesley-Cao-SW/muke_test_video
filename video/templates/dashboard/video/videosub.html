@@ -7,16 +7,24 @@ ${error}
 <%def name="content()">
 <%! 
     from django.shortcuts import reverse 
-    from app.model.video import IdentityType
+    from app.model.video import IdentityType, FromType
 %>
 <h1>${video.name}</h1>
 
+% if video.from_to != 'custom':
 <form id="video-edit-video-area" class="form-horizontal add-video-area" method="POST">
+% else:
+<form enctype="multipart/form-data" id="video-edit-video-area" class="form-horizontal add-video-area" method="POST">
+% endif
     ${csrf_token}
     <p>视频修改区域</p>
     <div class="form-group">
         <label >视频地址</label>
+        % if video.from_to != 'custom':
         <input id="url" type="text" class="form-control" name="url" placeholder="地址" >
+        % else:
+        <input id="url" type="file" class="form-control" name="url" placeholder="地址" >
+        % endif
         <label >视频集数</label>
         <input id="number" type="number" class="form-control" name="number" placeholder="集数" >
         <input id="videosub-input-id" type="hidden" name="videosub_id" value="" >
@@ -57,7 +65,11 @@ ${error}
             %for videosub in video.video_sub.all():
             <tr>
             <td>第${videosub.number}集</td>
+            % if FromType(video.from_to) == FromType.custom:
+            <td><p class="url">${videosub.url or '处理中..'}</p></td>
+            % else:
             <td><p class="url">${videosub.url}</p></td>
+            % endif
             <td>
                 <a class="btn btn-default" href="${videosub.url}">查看</a><br />
                 <a class="btn btn-default" href="${reverse('dashboard_sub_delete', kwargs = {'video_id': video.id, 'sub_id':videosub.id})}">删除</a><br />

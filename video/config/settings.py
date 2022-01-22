@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
+# import djcelery
 from pathlib import Path
+
+# djcelery.setup_loader()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,6 +43,10 @@ INSTALLED_APPS = [
     'app'
 ]
 
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# CELERY_IMPORTS = ('app.tasks.task')
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -49,6 +56,20 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+#redis
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'CONNECTION_POOL_KWARGS': {'max_connections':200},
+            #'PASSWORD':xx
+        }
+    }
+}
+
 
 ROOT_URLCONF = 'config.urls'
 
@@ -127,3 +148,9 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# 七牛云配置
+QINIU_AK = 'zoSv-VfEreljjFGkmsFcSJ-F127iisAp5tYK7Fxe'
+QINIU_SK = 'QNvmwZvb_8vWYVR4aWsQD-xGVJPUC93TB_5-mEkL'
+QINIU_VIDEO = 'wesley-videos'
+QINIU_VIDEO_URL = 'http://r63lfghny.hn-bkt.clouddn.com'
