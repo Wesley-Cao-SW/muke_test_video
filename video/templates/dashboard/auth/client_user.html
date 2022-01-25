@@ -1,0 +1,62 @@
+<%inherit file="../base.html" />
+<%def name="title()">客户端用户管理</%def>
+<%def name="content()">
+<%! from django.shortcuts import reverse %>
+    <h1>客户端用户模块</h1>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>用户名</th>
+                <th>性别</th>
+                <th>年龄</th>
+                <th>生日</th>
+                <th>状态</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+                % for user in users:
+                <tr>
+                <td>${user.username}</td>
+                <td>${user.avatar}</td>
+                <td>${user.gender}</td>
+                <td>${user.birthday}</td>
+                <td>${user.status}</td>
+                <td>${user.created_time}</td>
+                <td>
+                    % if user.status:
+                    <button data-url="${reverse('dashboard_client_user')}" data-user-id="${user.id}" class="user-status-submit">冻结</button>
+                    % else:
+                    <button data-url="${reverse('dashboard_client_user')}" data-user-id="${user.id}" class="user-status-submit">解冻</button>
+                    % endif
+                    ${csrf_token}
+                </td>
+                </tr>
+                % endfor
+        </tbody>
+    </table>
+    <%
+        pervious_page = '{}?page={}'.format(reverse('dashboard_client_user'), current_page-1)
+        next_page = '{}?page={}'.format(reverse('dashboard_client_user'), current_page+1)
+    %>
+    <nav aria-label="...">
+        <ul class="pager">
+            %if current_page <=total and current_page >1:
+                <li><a href="${pervious_page}">上一页</a></li>
+            %else:
+                <li class="disabled"><a href="#">上一页</a></li>
+            %endif
+            <li class="disabled"><a>${current_page}</a></li>
+            %if current_page <total and current_page >= 1:
+                <li><a href="${next_page}">下一页</a></li>
+            %else:
+                <li class="disabled"><a href="#">下一页</a></li>
+            %endif
+        </ul>
+      </nav>
+</%def>
+
+<%def name="js()">
+<script src="/static/dashboard/js/client_user.js"></script>
+</%def>

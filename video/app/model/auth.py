@@ -5,7 +5,7 @@ from django.db import models
 
 def hash_password(password):
     if isinstance(password, str):
-        password = password.encode('uft-8')
+        password = password.encode('utf-8')
         # md5()进行加密，hexdigest()返回加密后的字符串
     return hashlib.md5(password).hexdigest().upper()
 

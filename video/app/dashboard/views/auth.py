@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from django import views
+from django.http import JsonResponse
 from django.views import View
 from django.shortcuts import redirect, reverse
 from app.libs.base_mako import render_to_response
@@ -9,6 +10,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.core.paginator import Paginator
 from app.utils.permission import dashboard_auth
 from django.middleware.csrf import get_token ,rotate_token
+from app.model.auth import ClientUser
 
 # 登录
 class Login(View):
@@ -72,7 +74,7 @@ class AdminManger(View):
         # users = User.objects.filter(is_superuser=True)
         page = request.GET.get('page',1)
         users = User.objects.all()
-        p = Paginator(users, 1)
+        p = Paginator(users, 10)
         total_page = p.num_pages
         
         if int(page) <= 1:
@@ -111,5 +113,33 @@ class UpdateAdminStatus(View):
             user.save()
         
         return redirect(reverse('dashboard_admin'))
+       
+       
+class ClientManager(View):
+      TEMPLATE = 'dashboard/auth/client_user.html'
+      
+      def get(self, request):
+          
+          data = {}
+          page = request.GET.get('page',1)
+          users = ClientUser.objects.all()
+          
+          p = Paginator(users, 10)
+          total_page = p.num_pages
+          
+          if int(page) <= 1:
+            page = 1
         
+          current_page_obj = p.get_page(int(page)).object_list
+          
+          data['users'] = current_page_obj
+          data['total'] = total_page
+          data['current_page'] = int(page)
+          return render_to_response(request, self.TEMPLATE, data)
+      
+      def post(self, request):
+          user_id = request.POST.get('userId')
+          user = ClientUser.objects.get(id=user_id)
+          user.update_status()
+          return JsonResponse({'code':0 , 'msg': 'success'})
     

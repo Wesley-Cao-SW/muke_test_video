@@ -2,6 +2,8 @@
 
 import functools
 from django.shortcuts import redirect, reverse
+from app.models import ClientUser
+from .consts import COOKIE_NAME
 
 def dashboard_auth(func):
     
@@ -14,3 +16,18 @@ def dashboard_auth(func):
         
         return func(self, request, *args, **kwargs)
     return wrapper
+
+# 判断是否登录
+def client_auth(request):
+    
+    value = request.COOKIES.get(COOKIE_NAME)
+    
+    if not value:
+        return None
+    
+    user = ClientUser.objects.filter(id=value)
+    
+    if user and user.status:
+        return user[0]
+    else:
+        return None

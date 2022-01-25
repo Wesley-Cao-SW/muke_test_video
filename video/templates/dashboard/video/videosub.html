@@ -104,6 +104,37 @@ ${error}
     </tbody>
 </table>
 
+<h2>评论</h2>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>内容</th>
+            <th>评论者</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+            %for comment in comments:
+            <tr>
+            <td>${comment.content}</td>
+            <td>${comment.user.username}</td>
+            <td>${comment.status}</td>
+            <td>
+                <a class="btn btn-default" href="${reverse('dashboard_comment_status', kwargs={'comment_id': comment.id, 'video_id': video.id})}">
+                    % if comment.status == True:
+                    <span>下线</span>
+                    % else:
+                    <span>上线</span>
+                    % endif
+                </a>
+            </td>
+            </tr>
+            % endfor
+    </tbody>
+</table>
+
 </%def>
 
 <%def name="js()">

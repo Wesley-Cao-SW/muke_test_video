@@ -3,8 +3,9 @@
 from os import name
 from django.urls import path
 from .views.base import Index
-from .views.auth import Login, Logout, AdminManger, UpdateAdminStatus
+from .views.auth import Login, Logout, AdminManger, UpdateAdminStatus, ClientManager
 from .views.video import ExternalVideo, VideoSubView, VideoStarView, StarDelet, SubDelet, VideoUpdate, VideoStatusUpdate
+from .views.comments import CommentsStatus
 
 urlpatterns = [
     path('index', Index.as_view(), name='dashboard_index'),
@@ -19,4 +20,6 @@ urlpatterns = [
     path('index/externalvideo/sub/delete/<int:sub_id>/<int:video_id>', SubDelet.as_view(), name='dashboard_sub_delete'),
     path('index/externalvideo/update/<int:video_id>', VideoUpdate.as_view(), name='dashboard_externalvideo_update'),
     path('index/externalvideo/statusupdate/<int:video_id>', VideoStatusUpdate.as_view(), name='dashboard_externalvideo_statusupdate'),
+    path('index/video/comments/status/<int:comment_id>/<int:video_id>', CommentsStatus.as_view(), name='dashboard_comment_status'),
+    path('index/clientuser', ClientManager.as_view(), name='dashboard_client_user'),
 ]

@@ -6,6 +6,7 @@ from django.shortcuts import redirect, reverse
 from app.libs.base_mako import render_to_response
 from app.utils.permission import dashboard_auth
 from app.model.video import VideoType, FromType, NationalityType, IdentityType
+from app.model.comment import Comment
 from app.utils.common import check_and_get_video_type, handle_video
 from app.model.video import Video, VideoSub, VideoStar
 
@@ -93,6 +94,9 @@ class VideoSubView(View):
         data['video'] = video
         error = request.GET.get('error', '')
         data['error'] = error
+        
+        comments = Comment.objects.filter(video=video).order_by('-id')
+        data['comments'] = comments
         return render_to_response(request, self.TEMPLATE, data)
     
     def post(self, request, video_id):
