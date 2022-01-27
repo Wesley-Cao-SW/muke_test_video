@@ -10,6 +10,7 @@ from app.libs.base_mako import render_to_response
 from app.utils.permission import client_auth
 from app.utils.consts import COOKIE_NAME
 from app.model.auth import ClientUser
+from django.middleware.csrf import get_token ,rotate_token
 
 class User(View):
     TEMPLATE = 'client/auth/user.html'
